@@ -27,7 +27,7 @@ class LinearRegression:
         for i in range(self.n_iters):
             current_loss = self.loss(w, b)
             print("Interaction %4d => Loss: %6f" % (i, current_loss))
-            # copilot suggested using if instead of elif
+            # copilot suggested using if instead of elif, but it changes the format
             if self.loss(w + self.lr, b) < current_loss:
                 w += self.lr
             elif self.loss(w - self.lr, b) < current_loss:
