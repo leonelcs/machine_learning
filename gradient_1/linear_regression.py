@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 class LinearRegression:
     
-    def __init__(self, learning_rate=0.001, n_iters=99):
+    def __init__(self, learning_rate=0.001, n_iters=5000):
         self.lr = learning_rate
         print("lr: %4f" % self.lr)
         self.n_iters = n_iters
@@ -22,21 +22,25 @@ class LinearRegression:
         plt.plot(self.X, self.Y, 'bo')
         plt.show()
 
-    def gradient(self, w):
-        result = 2*np.average(self.X*(self.predict(self.X, w, 0) - self.Y))
-        return result
+    def gradient(self, w, b):
+        result_w = 2*np.average(self.X*(self.predict(self.X, w, b) - self.Y))
+        result_b = 2*np.average(self.predict(self.X, w, b) - self.Y)
+        return result_w, result_b
 
     def train(self):
         w = b = 0
         current_loss = sys.float_info.max
         for i in range(self.n_iters):
-            new_loss = self.loss(w, 0)
+            new_loss = self.loss(w, b)
             if abs(current_loss - new_loss) > 0.001:
+                current_loss = new_loss
                 print("Iteration %d: w=%.3f, b=%.3f, Loss=%.10f" % (i, w, b, new_loss))
-                w -= self.gradient(w)*self.lr
+                w_gradient, b_gradient = self.gradient(w, b)
+                w -= w_gradient*self.lr
+                b -= b_gradient*self.lr
             else:
-                return w, 0
-        return w, 0
+                return w, b
+        return w, b
 
 
     def predict(self, X, w, b):
