@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 import sys
 
 class LinearRegression:
-    def __init__(self, learning_rate=0.001, n_iters=50000):
+    def __init__(self, file="pizza_3_vars.txt",learning_rate=0.001, n_iters=100000):
         self.lr = learning_rate
         print("lr: %4f" % self.lr)
         self.n_iters = n_iters
-        x1, x2, x3, y = np.loadtxt("pizza_3_vars.txt", skiprows=1, unpack=True)
+        x1, x2, x3, y = np.loadtxt(file, skiprows=1, unpack=True)
 
-        self.X = np.column_stack((x1, x2, x3))
+        self.X = np.column_stack((np.ones(x1.size), x1, x2, x3))
         self.Y = y.reshape(-1, 1)
 
 
@@ -25,12 +25,12 @@ class LinearRegression:
         plt.plot(self.X, self.Y, 'bo')
         plt.show()
 
-    def train(self):
+    def train(self, precision=0.0001):
         w = np.zeros((self.X.shape[1], 1))
         current_loss = sys.float_info.max
         for i in range(self.n_iters):
             new_loss = self.loss(w)
-            if abs(current_loss - new_loss) > 0.001:
+            if abs(current_loss - new_loss) > precision:
                 current_loss = new_loss
                 print("Iteration %d, Loss=%.10f" % (i, new_loss))
                 w -= self.gradient(w)*self.lr

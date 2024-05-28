@@ -8,7 +8,7 @@ class Main:
 
     def start(self):
         #defaults to 0.01 and 2000
-        self.linear_regression = LinearRegression()
+        self.linear_regression = LinearRegression(file="life_expectancy.txt", learning_rate=0.0001, n_iters=100000)
 
 if __name__ == '__main__':
     main = Main()
@@ -16,9 +16,7 @@ if __name__ == '__main__':
 
     w = main.linear_regression.train()
 
-    x1 = 20
-    x2 = 25
-    x3 = 10
-    X = np.column_stack((x1, x2, x3))
-
-    print("Prediction: x=",X, "prediction: ", main.linear_regression.predict(X, w))
+print("\nWeights: %s" % w.T)
+print("\nA few predictions:")
+for i in range(5):
+    print("X[%d] -> %.4f (label: %d)" % (i, main.linear_regression.predict(main.linear_regression.X[i], w), main.linear_regression.Y[i]))
