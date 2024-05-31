@@ -20,12 +20,12 @@ class Classification:
         plt.plot(self.X, self.Y, 'bo')
         plt.show()
 
-    def train(self, precision=0.0001):
+    def train(self, Y):
         w = np.zeros((self.X.shape[1], 1))
         for i in range(self.n_iters):
             if (i%2000==0 or i==9999):
-                print("Iteration %4d => Loss: %.20f" % (i, self.loss(w)))
-            w -= self.gradient(w) * self.lr
+                print("Iteration %4d => Loss: %.20f" % (i, self.loss(Y, w)))
+            w -= self.gradient(Y, w) * self.lr
         return w
     
     def sigmoid(self, z):
@@ -38,21 +38,21 @@ class Classification:
     def classify(self, X, w):
         return np.round(self.forward(X, w))
     
-    def mse_loss(self, w):
-        return np.average((self.forward(self.X, w) - self.Y) ** 2)
+    def mse_loss(self, Y, w):
+        return np.average((self.forward(self.X, w) - Y) ** 2)
     
-    def loss(self, w):
+    def loss(self, Y, w):
         y_hat = self.forward(self.X, w)
-        first_term = self.Y * np.log(y_hat)
-        second_term = (1 - self.Y) * np.log(1 - y_hat)
+        first_term = Y * np.log(y_hat)
+        second_term = (1 - Y) * np.log(1 - y_hat)
         return -np.average(first_term + second_term)
     
-    def gradient(self, w):
-        return np.matmul(self.X.T, (self.forward(self.X, w) - self.Y)) / self.X.shape[0]
+    def gradient(self, Y, w):
+        return np.matmul(self.X.T, (self.forward(self.X, w) - Y)) / self.X.shape[0]
     
     # Doing inference to test our model
-    def test(self, w):
-        total_examples = self.X.shape[0]
-        correct_results = np.sum(self.classify(self.X, w) == self.Y)
+    def test(self, X, Y, w):
+        total_examples = X.shape[0]
+        correct_results = np.sum(self.classify(X, w) == Y)
         success_percent = correct_results * 100 / total_examples
         print("\nSuccess: %d/%d (%.2f%%)" % (correct_results, total_examples, success_percent))

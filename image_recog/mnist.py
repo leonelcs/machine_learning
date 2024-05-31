@@ -31,9 +31,14 @@ class MNISTLoader:
             # Reshape the list of labels into a one-column matrix:
             return np.frombuffer(all_labels, dtype=np.uint8).reshape(-1, 1)
 
-    def encode_fives(self, Y):
+    def encode_numbers(self, Y, digit=5):
     # Convert all 5s to 1, and everything else to 0
-        return (Y == 5).astype(int)
+        encoded_Y = np.zeros_like(Y)
+        n_labels = Y.shape[0]
+        for i in range(n_labels):
+            if Y[i] == digit:
+                encoded_Y[i][0] = 1
+        return encoded_Y
 
 
 
