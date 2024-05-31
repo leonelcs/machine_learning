@@ -1,39 +1,25 @@
-import numpy as np
-import gzip
-import struct
+from classification import Classification
+from mnist import MNISTLoader
 
-class Loader:
+def main():
+    # Load the MNIST data:
+    mnist_loader = MNISTLoader()
+    image_loaded = mnist_loader.load_image(filename="data/train-images-idx3-ubyte.gz")
+    X_train = mnist_loader.prepend_bias(image_loaded)
+    test_loaded = mnist_loader.load_image(filename="data/t10k-images-idx3-ubyte.gz")
+    X_test = mnist_loader.prepend_bias(test_loaded)
+    Y_train = mnist_loader.encode_fives(mnist_loader.load_labels(filename="data/train-labels-idx1-ubyte.gz"))
+    Y_test = mnist_loader.encode_fives(mnist_loader.load_labels(filename="data/t10k-labels-idx1-ubyte.gz"))
 
-    all_pixels = None
-    all_labels = None
+    # Train the model:
+    classifier = Classification(learning_rate=1e-5, n_iters=100)
+    classifier.X = X_train
+    classifier.Y = Y_train
+    w = classifier.train()
 
-    def __init__(self):
-        pass
+    # Test the model:
+    classifier.test(w)
 
-    def load_image(self, filename):
-        with gzip.open(filename, "rb") as f:
-            _ignored, n_images, columns, rows = struct.unpack(">IIII", f.read(16))
-            all_pixels = np.frombuffer(f.read(), dtype=np.uint8)
-            return all_pixels.reshape(n_images, columns * rows)
-        
-    def prepend_bias(self, X):
-        return np.insert(X, 0, 1, axis=1)
-    
-    def load_labels(self, filename):
-    # Open and unzip the file of images:
-        with gzip.open(self, filename, 'rb') as f:
-            # Skip the header bytes:
-            f.read(8)
-            # Read all the labels into a list:
-            all_labels = f.read()
-            # Reshape the list of labels into a one-column matrix:
-            return np.frombuffer(all_labels, dtype=np.uint8).reshape(-1, 1)
-
-    def encode_fives(Y):
-    # Convert all 5s to 1, and everything else to 0
-        return (Y == 5).astype(int)
-
-
-
-
+if __name__ == "__main__":
+    main()
 
